@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0D406B">
 <title>Москва на волне: тестовый макет сайта</title>
-<link rel="preload" href="brand/logo-blue.webp" as="image">
+<link rel="preload" href="brand/logo-blue.webp" as="image" type="image/webp">
 <style>
 @font-face{font-family:Montserrat;font-weight:500;font-display:swap;src:url(fonts/montserrat-cyrillic-500-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
 @font-face{font-family:Montserrat;font-weight:500;font-display:swap;src:url(fonts/montserrat-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+20AC,U+20BD,U+2212}
@@ -44,7 +44,10 @@ img{display:block}
 .pill:hover{background:var(--pale);color:var(--ink)}
 .pill.sm{min-height:44px;border-radius:999px;font-size:14px;padding:0 14px}
 .pill[aria-pressed=true]{background:var(--ink);color:#fff}
-.top .addr{margin-left:auto}
+.topnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topnav a[aria-current=page]{background:var(--ink);color:#fff}
+.toast:empty{display:none}
+.foot-in img.fish{height:auto}
 
 /* сетка страницы */
 .layout{max-width:1344px;margin:0 auto;padding:28px 24px 72px;display:grid;grid-template-columns:232px minmax(0,1fr) 320px;gap:40px;align-items:start}
@@ -257,7 +260,8 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
  .top-in{padding:8px 16px;gap:8px 12px}
  .logo img{height:40px}
  .top .cartbtn{display:none}
- .top .addr{min-height:44px;font-size:14px}
+ .topnav .wide{display:none}
+ .topnav .pill{min-height:44px;font-size:14px}
  .search{order:3;flex-basis:100%;max-width:none}
  .layout{grid-template-columns:minmax(0,1fr);padding:16px 16px 56px;gap:32px}
  .side{display:none}
@@ -295,10 +299,9 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
 <header class="top glass">
 <div class="ribbon">Тестовый макет, не официальный сайт.<span> Цены, наличие и фото условные.</span></div>
 <div class="top-in">
-<a class="logo" href="#home" aria-label="Москва на волне, на главную"><img src="brand/logo-blue.webp" width="181" height="48" alt="Рыбные рынки «Москва на волне»"></a>
+<a class="logo" href="#home"><img src="brand/logo-blue.webp" width="181" height="48" alt="Рыбные рынки «Москва на волне», на главную"></a>
 <label class="search"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Поиск по каталогу</span><input id="q" type="search" placeholder="Найти рыбу, икру, рецепт" autocomplete="off"></label>
-<a class="pill addr" href="#markets">Рынки</a>
-<a class="pill cartbtn" href="#cart">Корзина<span id="hdcount"></span></a>
+<nav class="topnav" aria-label="Основное меню"><a class="pill wide" href="#catalog" data-tab="catalog">Каталог</a><a class="pill wide" href="#recipes" data-tab="recipes">Рецепты</a><a class="pill" href="#markets" data-tab="markets">Рынки</a><a class="pill cartbtn" href="#cart" data-tab="cart">Корзина<span id="hdcount"></span></a></nav>
 </div>
 </header>
 
@@ -314,14 +317,14 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
 <img class="lg" src="brand/logo-white.webp" width="241" height="64" alt="Рыбные рынки «Москва на волне»">
 <nav aria-label="Разделы сайта"><a href="#catalog">Каталог</a><a href="#recipes">Рецепты</a><a href="#markets">Рынки</a><a href="#cart">Корзина</a></nav>
 <p>Проект Правительства Москвы. Доставку выполняет сервис «Купер». Это тестовый макет: цены, наличие и фото условные.</p>
-<img class="fish" src="brand/fish3.webp" alt="">
+<img class="fish" src="brand/fish3.webp" width="900" height="307" alt="">
 </div>
 </footer>
 
-<div class="cartbar" id="cartbar"></div>
+<div class="cartbar" id="cartbar" hidden></div>
 <nav class="tabbar glass" id="tabbar" aria-label="Нижнее меню"></nav>
-<div id="modal"></div>
-<div id="story"></div>
+<div id="modal" hidden></div>
+<div id="story" hidden></div>
 <div class="toast glass" id="toast" role="status"></div>
 <script>
 (function () {
@@ -557,7 +560,7 @@ function modalHTML(id) {
 var stTimer = null;
 function drawStory() {
  clearTimeout(stTimer);
- if (!S.story) { $('story').innerHTML = ''; document.body.style.overflow = $('modal').innerHTML ? 'hidden' : ''; return; }
+ if (!S.story) { $('story').innerHTML = ''; $('story').hidden = true; document.body.style.overflow = $('modal').innerHTML ? 'hidden' : ''; return; }
  var st = STORIES[S.story.i], sl = st.slides[S.story.k];
  S.seen[st.id] = 1; save();
  var bars = st.slides.map(function (x, i) { return '<i class="' + (i < S.story.k ? 'done' : i === S.story.k ? 'now' : '') + '"></i>'; }).join('');
@@ -567,6 +570,7 @@ function drawStory() {
   '<div class="sv-bars">' + bars + '</div><button type="button" class="sv-x" data-act="st-close" aria-label="Закрыть">×</button>' +
   '<button type="button" class="sv-nav prev" data-act="st-prev" aria-label="Назад"></button><button type="button" class="sv-nav next" data-act="st-next" aria-label="Дальше"></button>' +
   '<div class="sv-text"><b class="j">' + sl.h + '</b><p>' + sl.p + '</p>' + (sl.cta ? '<a class="btn" href="' + sl.cta[1] + '"' + (ext ? '' : ' data-act="st-go"') + '>' + sl.cta[0] + '</a>' : '') + '</div></div></div>';
+ $('story').hidden = false;
  document.body.style.overflow = 'hidden';
  stTimer = setTimeout(function () { stepStory(1); }, 6000);
 }
@@ -614,10 +618,13 @@ function render(keepScroll) {
  var c = count();
  $('hdcount').textContent = c ? ' · ' + c : '';
  $('cartbar').className = 'cartbar' + (c && !onCart ? ' show' : '');
+ $('cartbar').hidden = !(c && !onCart);
  $('cartbar').innerHTML = '<a href="#cart"><span>Корзина · ' + c + ' шт.</span><span class="j" style="font-size:20px">' + approx(Object.keys(S.cart)) + rub(total()) + ' ₽</span></a>';
  var tab = route === 'cart' ? 'cart' : route === 'markets' ? 'markets' : route === 'recipes' || route.indexOf('r-') === 0 ? 'recipes' : route === 'catalog' || route.indexOf('cat-') === 0 ? 'catalog' : route === 'home' || route.indexOf('s-') === 0 ? 'home' : '';
  $('tabbar').innerHTML = TABS.map(function (t) { return '<a href="#' + t[0] + '"' + (t[0] === tab ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + t[2] + '</svg>' + t[1] + (t[0] === 'cart' && c ? '<em>' + c + '</em>' : '') + '</a>'; }).join('');
  $('modal').innerHTML = modal ? modalHTML(modal) : '';
+ $('modal').hidden = !modal;
+ Array.prototype.forEach.call(document.querySelectorAll('.topnav a'), function (a) { if (a.getAttribute('data-tab') === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
  document.body.style.overflow = modal || S.story ? 'hidden' : '';
  if (!keepScroll && !modal) window.scrollTo(0, 0);
 }
