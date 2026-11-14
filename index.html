@@ -127,8 +127,16 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
 .price.sale .j{color:var(--red)}
 .price s{font-size:13px;opacity:.75}
 .name{display:block;min-height:44px;line-height:1.35;text-decoration:none}
-.name span,.mut{opacity:.75}
-.name span{white-space:nowrap}
+.mut{opacity:.75}
+.name span,.wt{color:rgba(13,64,107,.52);white-space:nowrap}
+.wt{font-size:15px}
+.stk{position:absolute;right:10px;top:10px;width:56px;height:56px;border-radius:50%;box-shadow:0 2px 8px rgba(13,64,107,.25);transition:transform .35s var(--ease)}
+.card:hover .stk{transform:rotate(-8deg) scale(1.06)}
+.ph img.stk{inset:10px 10px auto auto;width:56px;height:56px;object-fit:contain}
+.card:hover .ph img.stk{transform:rotate(-8deg) scale(1.06)}
+.sheet .ph img.stk{width:76px;height:76px;inset:14px auto auto 14px}
+.pick{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.btn[disabled]{opacity:.6;cursor:default;transform:none;box-shadow:none}
 .sub{font-size:13px}
 @media (min-width:761px){.grid.shelf>:nth-child(n+4){display:none}}
 
@@ -184,8 +192,10 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
 .opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .opt{min-width:0;padding:0;border:0;background:transparent;text-align:left;display:flex;flex-direction:column;gap:8px}
 .opt[aria-pressed=true] .ph{outline:3px solid var(--ink);outline-offset:-3px}
-.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:28px;max-width:600px}
-.steps li{display:flex;flex-direction:column;gap:6px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:28px}
+.steps li{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:center}
+.steps li .ph{aspect-ratio:4/3;border-radius:20px}
+.steps li>div:last-child{display:flex;flex-direction:column;gap:6px}
 .steps small{font-size:13px;font-weight:700}
 .steps strong{font-size:18px}
 .steps span{font-size:16px;line-height:1.55}
@@ -277,6 +287,9 @@ h1.page{font-size:clamp(34px,4.2vw,48px);line-height:1.05}
  .ph{border-radius:20px}
  .price .j{font-size:17px}
  .lead{font-size:16px}
+ .steps li{grid-template-columns:minmax(0,1fr);gap:12px}
+ .ph img.stk{width:44px;height:44px;inset:8px 8px auto auto}
+ .sheet .ph img.stk{width:60px;height:60px}
  .story{flex-basis:98px;height:130px;border-radius:20px}
  .sv{padding:0}.sv-card{width:100%;height:100%;border-radius:0}
  .mk iframe{height:280px}
@@ -333,17 +346,18 @@ var IMG = function (n) { return 'img/' + n + '.webp'; };
 var KUPER = 'https://web.kuper.ru/navolne';
 
 // Каталог. В рабочей версии эти данные приходят из 1С. Цены и скидки в макете условные.
+// sku — артикул ретейлера, по нему товар уходит в корзину Купера. В макете артикулы условные.
 var P = {
- trout:  { t: 'Форель охлаждённая', w: 'тушка 2–3 кг', price: 1490, unit: 'кг', n: 3725, piece: 'за тушку', pack: 'тушку', img: 19524007, cats: ['chilled'], tags: ['soup'], por: '6–8 порций', hint: 'Тушки хватит на 6–8 порций. На рынке её бесплатно пожарят или запекут.', facts: [['Откуда', 'Мурманск'], ['Вес тушки', '2–3 кг']] },
- forelp: { t: 'Форель радужная порционная', w: '300–400 г', price: 990, unit: 'кг', n: 350, piece: 'за рыбу', pack: 'рыбу', img: 13020526, cats: ['chilled'], tags: ['grill', 'soup'], por: '1 порция', hint: 'Одна рыба на человека. Годится для решётки и для ухи.', facts: [['Откуда', 'Карелия'], ['Вес рыбы', '300–400 г']] },
- salmon: { t: 'Лосось охлаждённый, филе на коже', w: 'кусок 1–1,5 кг', price: 2190, old: 2490, unit: 'кг', n: 2740, piece: 'за кусок', pack: 'кусок', img: 14062142, cats: ['chilled'], tags: ['feast'], por: '5–6 порций', hint: 'Куска 1,25 кг хватит на 5–6 порций. Запекайте кожей вниз, так мякоть останется сочной.', facts: [['Откуда', 'Мурманск'], ['Вес куска', '1–1,5 кг']] },
- steak:  { t: 'Лосось охлаждённый, стейк', w: '250–300 г', price: 2390, unit: 'кг', n: 660, piece: 'за стейк', pack: 'стейк', img: 7451966, cats: ['chilled'], tags: ['grill'], por: '1 порция', hint: 'Один стейк на порцию. На решётке жарьте по 3–4 минуты с каждой стороны.', facts: [['Откуда', 'Мурманск'], ['Вес стейка', '250–300 г']] },
- keta:   { t: 'Кета свежемороженая, стейки', w: '1 кг', price: 790, old: 890, unit: 'шт', n: 790, per: '79 ₽ за 100 г', pack: 'упаковку', img: 3029526, cats: ['frozen'], tags: ['soup'], por: '4–5 порций', hint: 'Дикая тихоокеанская рыба, мясо плотное и нежирное. Запекайте в фольге или варите уху.', facts: [['Вид', 'Дикая рыба'], ['Упаковка', '1 кг']] },
- ikra:   { t: 'Икра горбуши слабосолёная', w: '250 г', price: 1800, unit: 'шт', n: 1800, per: '720 ₽ за 100 г', pack: 'банку', img: 8599601, cats: ['caviar'], tags: ['feast'], por: '12–15 бутербродов', hint: 'Банки хватит на 12–15 бутербродов.', facts: [['Посол', 'Слабый'], ['Упаковка', 'Банка 250 г']] },
- ikrak:  { t: 'Икра кеты слабосолёная', w: '250 г', price: 2400, unit: 'шт', n: 2400, per: '960 ₽ за 100 г', pack: 'банку', img: 6823268, cats: ['caviar'], tags: ['feast'], por: '12–15 бутербродов', hint: 'Икринки крупнее, чем у горбуши. Банки хватит на 12–15 бутербродов.', facts: [['Посол', 'Слабый'], ['Упаковка', 'Банка 250 г']] },
- slab:   { t: 'Лосось слабосолёный, нарезка', w: '200 г', price: 590, old: 690, unit: 'шт', n: 590, per: '295 ₽ за 100 г', pack: 'упаковку', img: 14062113, cats: ['own'], tags: ['feast'], por: '6–8 бутербродов', hint: 'Упаковки хватит на 6–8 бутербродов.', facts: [['Посол', 'Слабый'], ['Упаковка', '200 г']] },
- skewer: { t: 'Шпажки из морепродуктов, сет', w: '6 шт.', price: 890, unit: 'шт', n: 890, per: '148 ₽ за шпажку', pack: 'сет', img: 8250276, cats: ['own'], tags: ['grill'], por: '2–3 порции', hint: 'Жарьте на решётке, сковороде-гриль или электрогриле.', facts: [['В сете', '6 шпажек'], ['Готовность', 'Нужно пожарить']] },
- poke:   { t: 'Поке с лососем', w: '350 г', price: 490, unit: 'шт', n: 490, per: '140 ₽ за 100 г', pack: 'порцию', img: 15913488, cats: ['own'], tags: [], por: '1 порция', hint: 'Готовое блюдо. Разогревать не нужно.', facts: [['Вес', '350 г'], ['Готовность', 'Готово к столу']] }
+ trout:  { sku: 'DEMO-001', t: 'Форель охлаждённая, тушка', w: '2–3 кг', price: 1490, unit: 'кг', n: 3725, pack: 'тушку', img: 19524007, cats: ['chilled'], tags: ['soup'], hint: 'На рынке тушку бесплатно пожарят или запекут.', facts: [['Откуда', 'Мурманск'], ['Вес тушки', '2–3 кг']] },
+ forelp: { sku: 'DEMO-002', t: 'Форель радужная порционная', w: '300–400 г', price: 990, unit: 'кг', n: 350, pack: 'рыбу', img: 13020526, cats: ['chilled'], tags: ['grill', 'soup'], hint: 'Годится для решётки и для ухи.', facts: [['Откуда', 'Карелия'], ['Вес рыбы', '300–400 г']] },
+ salmon: { sku: 'DEMO-003', t: 'Лосось охлаждённый, филе на коже', w: '1–1,5 кг', price: 2190, old: 2490, unit: 'кг', n: 2740, pack: 'кусок', img: 14062142, cats: ['chilled'], tags: ['feast'], hint: 'Запекайте кожей вниз, так мякоть останется сочной.', facts: [['Откуда', 'Мурманск'], ['Вес куска', '1–1,5 кг']] },
+ steak:  { sku: 'DEMO-004', t: 'Лосось охлаждённый, стейк', w: '250–300 г', price: 2390, unit: 'кг', n: 660, pack: 'стейк', img: 7451966, cats: ['chilled'], tags: ['grill'], hint: 'На решётке жарьте по 3–4 минуты с каждой стороны.', facts: [['Откуда', 'Мурманск'], ['Вес стейка', '250–300 г']] },
+ keta:   { sku: 'DEMO-005', t: 'Кета свежемороженая, стейки', w: '1 кг', price: 790, old: 890, unit: 'шт', n: 790, pack: 'упаковку', img: 3029526, cats: ['frozen'], tags: ['soup'], hint: 'Дикая тихоокеанская рыба, мясо плотное и нежирное. Запекайте в фольге или варите уху.', facts: [['Вид', 'Дикая рыба'], ['Упаковка', '1 кг']] },
+ ikra:   { sku: 'DEMO-006', t: 'Икра горбуши слабосолёная', w: '250 г', price: 1800, unit: 'шт', n: 1800, pack: 'банку', img: 8599601, cats: ['caviar'], tags: ['feast'], hint: '', facts: [['Посол', 'Слабый'], ['Упаковка', 'Банка 250 г']] },
+ ikrak:  { sku: 'DEMO-007', t: 'Икра кеты слабосолёная', w: '250 г', price: 2400, unit: 'шт', n: 2400, pack: 'банку', img: 6823268, cats: ['caviar'], tags: ['feast'], hint: 'Икринки крупнее, чем у горбуши.', facts: [['Посол', 'Слабый'], ['Упаковка', 'Банка 250 г']] },
+ slab:   { sku: 'DEMO-008', t: 'Лосось слабосолёный, нарезка', w: '200 г', price: 590, old: 690, unit: 'шт', n: 590, pack: 'упаковку', img: 14062113, cats: ['own'], tags: ['feast'], hint: '', facts: [['Посол', 'Слабый'], ['Упаковка', '200 г']] },
+ skewer: { sku: 'DEMO-009', t: 'Шпажки из морепродуктов, сет', w: '6 шт.', price: 890, unit: 'шт', n: 890, pack: 'сет', img: 8250276, cats: ['own'], tags: ['grill'], hint: 'Жарьте на решётке, сковороде-гриль или электрогриле.', facts: [['В сете', '6 шпажек'], ['Готовность', 'Нужно пожарить']] },
+ poke:   { sku: 'DEMO-010', t: 'Поке с лососем', w: '350 г', price: 490, unit: 'шт', n: 490, pack: 'порцию', img: 15913488, cats: ['own'], tags: [], hint: 'Готовое блюдо. Разогревать не нужно.', facts: [['Вес', '350 г'], ['Готовность', 'Готово к столу']] }
 };
 var CATS = [
  { id: 'own', t: 'Собственное производство', note: 'Нарезка, шпажки, поке', img: 8250276 },
@@ -352,9 +366,9 @@ var CATS = [
  { id: 'caviar', t: 'Икра', note: 'Горбуша и кета', img: 6823268 }
 ];
 var SCEN = [
- { id: 'grill', t: 'На гриль', hint: 'Берите стейк или порционную рыбу: по одной штуке на человека. Решётку разогрейте, рыбу переверните один раз.' },
+ { id: 'grill', t: 'На гриль', hint: 'Берите стейк или порционную рыбу. Решётку разогрейте, рыбу переверните один раз.' },
  { id: 'soup', t: 'На уху', hint: 'На литр воды нужно 300–400 г рыбы. Кладите её в конце: рыба варится 7–10 минут.' },
- { id: 'feast', t: 'К столу', hint: 'На шестерых хватит банки икры и упаковки слабосолёного лосося.' }
+ { id: 'feast', t: 'К столу', hint: 'Икра и слабосолёный лосось для бутербродов и закусок.' }
 ];
 // Сторис. Чтобы добавить новую, допишите объект в начало списка: обложка, заголовок и слайды.
 var STORIES = [
@@ -366,12 +380,12 @@ var STORIES = [
   { fish: 1, h: '10% вернётся баллами', p: 'Покажите кассиру QR-код «Миллиона призов». Баллы придут сразу после оплаты.' },
   { fish: 3, h: 'Где взять QR-код', p: 'Войдите на сайт программы через Mos ID и нажмите на щит в правом верхнем углу.', cta: ['Адреса рынков', '#markets'] }] },
  { id: 'grill', t: 'На гриль', img: 10917524, slides: [
-  { img: 10917524, h: 'На гриль', p: 'Стейк или порционная рыба: по одной штуке на человека.', cta: ['Что взять', '#s-grill'] },
+  { img: 10917524, h: 'На гриль', p: 'Стейки, порционная рыба и шпажки для решётки.', cta: ['Что взять', '#s-grill'] },
   { img: 2597565, h: 'Стейк лосося', p: 'По 3–4 минуты с каждой стороны. Переверните один раз.', cta: ['Рецепт', '#r-steaks'] }] },
  { id: 'soup', t: 'На уху', img: 5305426, slides: [
   { img: 5305426, h: 'На уху', p: 'На литр воды нужно 300–400 г рыбы. Подойдут форель и кета.', cta: ['Рецепт ухи', '#r-uha'] }] },
  { id: 'feast', t: 'К столу', img: 290339, slides: [
-  { img: 290339, h: 'К столу', p: 'На шестерых хватит банки икры и упаковки слабосолёного лосося.', cta: ['Что взять', '#s-feast'] }] },
+  { img: 290339, h: 'К столу', p: 'Икра и слабосолёный лосось для бутербродов и закусок.', cta: ['Что взять', '#s-feast'] }] },
  { id: 'kuper', t: 'Доставка', fish: 2, slides: [
   { fish: 2, h: 'Привезёт Купер', p: 'Рыбу с рынка доставляет сервис «Купер».', cta: ['Открыть Купер', KUPER] }] }
 ];
@@ -380,21 +394,23 @@ var R = {
  uha: { t: 'Уха из красной рыбы', time: '45 мин', scen: 'soup', img: 5305426, intro: 'Форель или кета, картофель и морковь. Варится в одной кастрюле.',
   groups: [{ label: 'Рыба', opts: [{ id: 'forelp', per: 0.5 }, { id: 'keta', fixed: 1 }] }],
   home: function (n) { return 'Вода ' + String(n / 2).replace('.', ',') + ' л, картофель ' + n + ' шт., морковь ' + Math.ceil(n / 4) + ' шт., лук 1 шт., лавровый лист 2 шт., перец горошком, соль, укроп.'; },
-  steps: [['Подготовьте продукты', 'Нарежьте рыбу крупными кусками, картофель кубиком, морковь кружками. Луковицу оставьте целой.'], ['Сварите овощи', 'Залейте овощи холодной водой, добавьте перец горошком. Доведите до кипения, варите 15 минут и посолите.'], ['Добавьте рыбу', 'Варите на слабом огне 7–10 минут и снимайте пену. В конце положите лавровый лист.'], ['Дайте настояться', 'Снимите с огня и выньте луковицу. Оставьте под крышкой на 10 минут. Подавайте с укропом.']] },
+  steps: [['Подготовьте продукты', 29145759, 'Нарежьте рыбу крупными кусками, картофель кубиком, морковь кружками. Луковицу оставьте целой.'], ['Сварите овощи', 15505487, 'Залейте овощи холодной водой, добавьте перец горошком. Доведите до кипения, варите 15 минут и посолите.'], ['Добавьте рыбу', 37456033, 'Варите на слабом огне 7–10 минут и снимайте пену. В конце положите лавровый лист.'], ['Дайте настояться', 5305426, 'Снимите с огня и выньте луковицу. Оставьте под крышкой на 10 минут. Подавайте с укропом.']] },
  steaks: { t: 'Стейк лосося на гриле', time: '25 мин', scen: 'grill', img: 2597565, intro: 'Стейк, соль, масло и лимон. На решётке готовится 6–8 минут.',
   groups: [{ label: 'Стейки', opts: [{ id: 'steak', per: 1 }] }],
   home: function (n) { return 'Лимон ' + String(n / 4).replace('.', ',') + ' шт., оливковое масло ' + n / 2 + ' ст. л., соль, чёрный перец.'; },
-  steps: [['Подготовьте стейки', 'Достаньте стейки из холодильника за 15 минут до жарки. Обсушите, смажьте маслом, посолите и поперчите.'], ['Пожарьте', 'Разогрейте решётку. Жарьте стейки по 3–4 минуты с каждой стороны, переверните один раз.'], ['Подавайте', 'Дайте стейкам полежать 2–3 минуты. Сбрызните лимонным соком.']] }
+  steps: [['Подготовьте стейки', 10432670, 'Достаньте стейки из холодильника за 15 минут до жарки. Обсушите, смажьте маслом, посолите и поперчите.'], ['Пожарьте', 555775, 'Разогрейте решётку. Жарьте стейки по 3–4 минуты с каждой стороны, переверните один раз.'], ['Подавайте', 2374946, 'Дайте стейкам полежать 2–3 минуты. Сбрызните лимонным соком.']] }
 };
 var MARKETS = [
- { t: 'Митино', a: 'м. Митино, ул. Дубравная, 51, стр. 1', oid: '188863750715' },
- { t: 'Косино-Ухтомский', a: 'Новоухтомское шоссе, 2А', oid: '220248881701' }
+ { id: 'mitino', t: 'Митино', a: 'м. Митино, ул. Дубравная, 51, стр. 1', oid: '188863750715' },
+ { id: 'kosino', t: 'Косино-Ухтомский', a: 'Новоухтомское шоссе, 2А', oid: '220248881701' }
 ];
 var WAVE_S = '<svg viewBox="0 0 30 12" width="26" height="11" fill="none" stroke="#36A9E1" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M3 6c4-6 8 6 12 0s8 6 12 0"/></svg>';
 
-var S = { cart: {}, serv: {}, pick: {}, q: '', f: {}, sort: 'pop', base: 'home', seen: {}, story: null };
-try { var saved = JSON.parse(localStorage.getItem('mnv-demo2') || 'null'); if (saved) { for (var k0 in saved.cart || {}) if (P[k0]) S.cart[k0] = saved.cart[k0]; S.seen = saved.seen || {}; } } catch (e) {}
-function save() { try { localStorage.setItem('mnv-demo2', JSON.stringify({ cart: S.cart, seen: S.seen })); } catch (e) {} }
+// Адрес серверной функции, которая создаёт корзину в Купере. Пока пусто, сайт работает в тестовом режиме.
+var CART_API = '';
+var S = { cart: {}, serv: {}, pick: {}, q: '', f: {}, sort: 'pop', base: 'home', seen: {}, story: null, store: '', link: '', busy: false };
+try { var saved = JSON.parse(localStorage.getItem('mnv-demo2') || 'null'); if (saved) { for (var k0 in saved.cart || {}) if (P[k0]) S.cart[k0] = saved.cart[k0]; S.seen = saved.seen || {}; S.store = saved.store === 'mitino' || saved.store === 'kosino' ? saved.store : ''; } } catch (e) {}
+function save() { try { localStorage.setItem('mnv-demo2', JSON.stringify({ cart: S.cart, seen: S.seen, store: S.store })); } catch (e) {} }
 function $(id) { return document.getElementById(id); }
 function rub(v) { return Math.round(v).toLocaleString('ru-RU'); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -404,18 +420,18 @@ function count() { var c = 0; for (var k in S.cart) c += S.cart[k]; return c; }
 function total() { var t = 0; for (var k in S.cart) t += S.cart[k] * P[k].n; return t; }
 function approx(list) { return list.some(function (id) { return P[id].unit === 'кг'; }) ? '≈ ' : ''; }
 function toast(text) { var el = $('toast'); el.textContent = text; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { el.classList.remove('on'); }, 1600); }
-function add(id, d) { var q = Math.max(0, (S.cart[id] || 0) + d); if (q) S.cart[id] = q; else delete S.cart[id]; save(); }
+function add(id, d) { S.link = ''; var q = Math.max(0, (S.cart[id] || 0) + d); if (q) S.cart[id] = q; else delete S.cart[id]; save(); }
 function pct(p) { return Math.round((p.old - p.price) / p.old * 100); }
 function img(n, alt) { return '<img src="' + IMG(n) + '" alt="' + (alt ? esc(alt) : '') + '" loading="lazy" decoding="async">'; }
 
 function priceHTML(p) { return '<p class="price' + (p.old ? ' sale' : '') + '"><span class="j">' + rub(p.price) + ' ₽' + (p.unit === 'кг' ? ' за кг' : '') + '</span>' + (p.old ? '<s>' + rub(p.old) + ' ₽</s>' : '') + '</p>'; }
-function subText(p) { return (p.unit === 'кг' ? '≈ ' + rub(p.n) + ' ₽ ' + p.piece : p.per) + ' · ' + p.por; }
+function own(p) { return p.cats.indexOf('own') >= 0 ? '<img class="stk" src="brand/sticker.webp" alt="Собственное производство" loading="lazy">' : ''; }
 function stepper(id, cls) { var p = P[id]; return '<span class="step ' + cls + '"><button type="button" data-act="dec" data-id="' + id + '" aria-label="Меньше: ' + esc(p.t) + '">−</button><b>' + (S.cart[id] || 0) + '</b><button type="button" data-act="inc" data-id="' + id + '" aria-label="Больше: ' + esc(p.t) + '">+</button></span>'; }
 function card(id) {
  var p = P[id], q = S.cart[id] || 0;
  var ctl = q ? stepper(id, 'glass') : '<button type="button" class="plus glass" data-act="inc" data-id="' + id + '" aria-label="В корзину: ' + esc(p.t) + '">+</button>';
- return '<article class="card"><div class="ph">' + img(p.img) + '<a href="#p-' + id + '" aria-label="' + esc(p.t) + '"></a>' + (p.old ? '<span class="chip sale">−' + pct(p) + '%</span>' : '') + ctl + '</div>' + priceHTML(p) +
-  '<a class="name" href="#p-' + id + '">' + esc(p.t) + ' <span>' + p.w.replace(/ /g, '&nbsp;') + '</span></a><span class="sub">' + subText(p) + '</span></article>';
+ return '<article class="card"><div class="ph">' + img(p.img) + '<a href="#p-' + id + '" aria-label="' + esc(p.t) + '"></a>' + own(p) + (p.old ? '<span class="chip sale">−' + pct(p) + '%</span>' : '') + ctl + '</div>' + priceHTML(p) +
+  '<a class="name" href="#p-' + id + '">' + esc(p.t) + ' <span>' + p.w.replace(/ /g, '&nbsp;') + '</span></a></article>';
 }
 function grid(list, empty, cls) { return list.length ? '<div class="grid' + (cls ? ' ' + cls : '') + '">' + list.map(card).join('') + '</div>' : '<p class="lead">' + (empty || 'С такими фильтрами ничего нет. Снимите один из них.') + '</p>'; }
 function head(t, href, more) { return '<div class="hd"><h2 class="j">' + t + '</h2>' + (href ? '<a class="pill sm" href="' + href + '">' + (more || 'Все') + ' ›</a>' : '') + '</div>'; }
@@ -502,7 +518,7 @@ function viewRecipe(rid) {
   return '<strong style="font-size:16px">' + g.label + ': ' + qtyText(cur, n) + '</strong><div class="opts">' + opts + '</div>';
  }).join('');
  var frozen = r.groups.some(function (g, gi) { return P[optFor(rid, gi).id].cats.indexOf('frozen') >= 0; });
- var steps = r.steps.map(function (s, i) { return '<li><small>Шаг ' + (i + 1) + ' из ' + r.steps.length + '</small><strong>' + s[0] + '</strong><span>' + (i === 0 && frozen ? 'Заранее разморозьте рыбу в холодильнике. ' : '') + s[1] + '</span></li>'; }).join('');
+ var steps = r.steps.map(function (s, i) { return '<li><div class="ph">' + img(s[1], s[0]) + '</div><div><small>Шаг ' + (i + 1) + ' из ' + r.steps.length + '</small><strong>' + s[0] + '</strong><span>' + (i === 0 && frozen ? 'Заранее разморозьте рыбу в холодильнике. ' : '') + s[2] + '</span></div></li>'; }).join('');
  var sc = SCEN.filter(function (x) { return x.id === r.scen; })[0];
  return '<article class="recipe"><div class="blk">' + crumbs([['Главная', 'home'], ['Рецепты', 'recipes'], [r.t]]) + '<h1 class="page j">' + esc(r.t) + '</h1>' +
   '<div class="chips"><span class="pill sm">' + r.time + '</span><a class="pill sm" href="#s-' + sc.id + '">' + sc.t + '</a></div></div>' +
@@ -534,8 +550,10 @@ function cartHTML(full) {
    return '<li>' + img(p.img) + '<span class="t">' + esc(p.t) + '<span class="j" style="font-size:15px">' + (p.unit === 'кг' ? '≈ ' : '') + rub(q * p.n) + ' ₽</span></span>' + stepper(id, 'flat') + '</li>';
   }).join('') + '</ul><p class="total"><span>Итого</span><span class="j">' + pre + rub(t) + ' ₽</span></p>' +
    (pre ? '<span class="sub">Рыбу продают на вес. Точную сумму посчитают после взвешивания.</span>' : '') +
-   '<a class="btn" href="' + KUPER + '">Заказать в Купере</a><button type="button" class="btn alt" data-act="copy">Скопировать список</button>' +
-   '<span class="note">Макет пока не передаёт корзину в Купер. Скопируйте список и соберите заказ на витрине рынка.</span>';
+   '<div class="pick"><b>С какого рынка привезти</b><div class="seg" role="group" aria-label="Рынок для доставки">' + MARKETS.map(function (m) { return '<button type="button" data-act="store" data-v="' + m.id + '" aria-pressed="' + (S.store === m.id) + '">' + m.t + '</button>'; }).join('') + '</div></div>' +
+   (S.link ? '<a class="btn" href="' + S.link + '">' + (CART_API ? 'Перейти в корзину Купера' : 'Открыть витрину Купера') + '</a>' : '<button type="button" class="btn" data-act="order"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Собираем корзину…' : 'Заказать в Купере') + '</button>') +
+   '<button type="button" class="btn alt" data-act="copy">Скопировать список</button>' +
+   '<span class="note">' + (CART_API ? 'Оплата и доставка проходят в Купере. Если вы там не вошли в аккаунт, Купер попросит войти.' : 'Тестовый режим. Запрос к Куперу собран, но не отправлен: нужен ключ API. Кнопка откроет витрину рынка.') + '</span>';
  }
  h += '<a class="strip" href="#markets"><span style="flex:1">На рынке купленную рыбу приготовят бесплатно</span><span aria-hidden="true">›</span></a>';
  if (full) { var more = ids().filter(function (i) { return !S.cart[i]; }).slice(0, 4); if (more.length) h += shelf('Добавьте к заказу', '#catalog', more); }
@@ -547,10 +565,10 @@ function modalHTML(id) {
  var buy = q ? '<div style="display:flex;gap:8px;align-items:center">' + stepper(id, 'flat') + '<a class="btn wide" style="flex:1" href="#cart"><span>В корзине</span><span class="j" style="font-size:20px">' + pre + rub(q * p.n) + ' ₽</span></a></div>'
   : '<button type="button" class="btn wide" data-act="inc" data-id="' + id + '"><span>В корзину</span><span class="j" style="font-size:20px">' + pre + rub(p.n) + ' ₽</span></button>';
  return '<div class="veil" data-act="close"><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(p.t) + '"><button type="button" class="x glass" data-act="close" aria-label="Закрыть">×</button>' +
-  '<div class="ph">' + img(p.img, p.t) + (p.old ? '<span class="chip sale">−' + pct(p) + '%</span>' : '') + '</div>' +
-  '<div class="info"><h1 class="j">' + esc(p.t) + '</h1><span class="sub">' + p.w + '</span>' +
+  '<div class="ph">' + img(p.img, p.t) + own(p) + (p.old ? '<span class="chip sale">−' + pct(p) + '%</span>' : '') + '</div>' +
+  '<div class="info"><h1 class="j">' + esc(p.t) + '</h1><span class="wt">' + p.w + '</span>' +
   '<p class="price' + (p.old ? ' sale' : '') + '"><span class="j" style="font-size:36px">' + rub(p.price) + ' ₽</span>' + (p.old ? '<s>' + rub(p.old) + ' ₽</s>' : '') + '<span style="font-weight:600">за ' + (p.unit === 'кг' ? '1 кг' : p.pack) + '</span></p>' +
-  '<span class="sub">' + subText(p) + '</span>' + buy + hint(p.hint) +
+  buy + (p.hint ? hint(p.hint) : '') +
   '<dl class="facts">' + p.facts.map(function (f) { return '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>'; }).join('') + '</dl>' +
   (rs.length ? '<div class="blk" style="gap:8px;align-items:stretch"><b>Рецепты с этой рыбой</b>' + rs.map(function (k) { return '<a class="strip" href="#r-' + k + '"><span style="flex:1">' + esc(R[k].t) + '</span><span class="mut">' + R[k].time + '</span><span aria-hidden="true">›</span></a>'; }).join('') + '</div>' : '') +
   '</div></div></div>';
@@ -638,6 +656,18 @@ document.addEventListener('click', function (e) {
  if (act === 'st-next') { stepStory(1); return; }
  if (act === 'st-prev') { stepStory(-1); return; }
  if (act === 'st-go') { S.story = null; drawStory(); return; }
+ if (act === 'store') { S.store = v; S.link = ''; save(); render(true); return; }
+ if (act === 'order') {
+  if (!S.store) { toast('Выберите рынок'); return; }
+  var body = { store: S.store, items: Object.keys(S.cart).map(function (k) { return { retailer_sku: P[k].sku, packs: S.cart[k] }; }) };
+  S.busy = true; render(true);
+  var req = CART_API
+   ? fetch(CART_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { if (!r.ok) throw new Error('bad'); return r.json(); }).then(function (j) { if (!j.url) throw new Error('bad'); return j.url; })
+   : new Promise(function (ok) { setTimeout(function () { ok(KUPER); }, 700); });
+  req.then(function (url) { S.busy = false; S.link = url; render(true); if (CART_API) location.assign(url); else toast('Корзина собрана'); },
+           function () { S.busy = false; render(true); toast('Купер не ответил. Скопируйте список'); });
+  return;
+ }
  if (act === 'copy') {
   var text = cartText();
   try { navigator.clipboard.writeText(text).then(function () { toast('Список скопирован'); }, function () { toast('Не получилось скопировать'); }); } catch (err) { toast('Не получилось скопировать'); }
